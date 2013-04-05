@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Bitcoin-OTC JS</title>
+    <link href="jquery-ui-1.10.2/css/ui-lightness/jquery-ui-1.10.2.custom.css" rel="stylesheet">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="jquery-ui-1.10.2/js/jquery-ui-1.10.2.custom.js"></script>
+    <script src="otc.js"></script>
+  </head>
+  <body>
+    
+    <div id="info-bar">
+      Ask: <span id="exr-ask"></span>,
+      Bid: <span id="exr-bid"></span>,
+      Spread: <span id="exr-spread"></span>,
+      Username: <span id="display-username"></span>
+    </div>
+    
+    <div id="main-tabs">
+      <ul>
+        <li><a href="#tab1">Tab1</a></li>
+        <li><a href="#tab2">Tab2</a></li>
+        <li><a href="#tab3">Tab3</a></li>
+        <li><a href="#tab4">Tab4</a></li>
+        <li><a href="#tab5">Tab5</a></li>
+      </ul>
+      <div id="tab1">This is tab number 1</div>
+      <div id="tab2">This is tab number 2</div>
+      <div id="tab3">This is tab number 3</div>
+      <div id="tab4">This is tab number 4</div>
+      <div id="tab5">This is tab number 5</div>
+    </div>
+    
+    <div id="login-box" title="Login">
+      <form id="login-form">
+        <fieldset>
+          <label for="login-username">Username</label>
+          <input type="text" name="username" id="login-username"></input>
+          <label for="login-username">Password</label>
+          <input type="text" name="password" id="login-password"></input>
+          
+          <input type="submit" value="Login" id="login-submit"></input>
+        </fieldset>
+      </form>
+    </div>
+    
+  </body>
+</html>
