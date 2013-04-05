@@ -1,5 +1,9 @@
-/* Handles rendering and attaching event handlers to the UI elements. This is effectively the 'controller' (and partially the view) */
-/* Dependencies: OTC */
+/* 
+* Handles rendering and attaching event handlers to the UI elements.
+* This is effectively the 'controller' (and partially the view).
+* Only UI-related state should be held here.
+* Dependencies: OTC
+*/
 
 OTC_UI = {
   
@@ -60,30 +64,56 @@ OTC_UI = {
     });
   },
   
+  /* Call this function when waiting for content to load */
+  /*waitFor: function(content) {
+    OTC.loading.append(content);
+  }
+  */
   
-  /* These are events, which are called somewhere else in the script */
   events: {
     /* This will run when the application loads */
+    /* This load event should probably go into the object constructor. Fix this */
     load: function() {
       OTC_UI.render(['loginBox', 'mainTabs']);
       OTC_UI.update(['exchangeRates']);
-    },
-    afterLogin: function() {
-      $("#login-box").dialog('close');
-      /* Load all the user data into the application */
-      OTC_UI.update('username');
+      
+      OTC.events.bind('login', function() {
+        $("#login-box").dialog('close');
+        /* Load all the user data into the application */
+        OTC_UI.update('username');
+      });
     },
   },
 };
 
-/* This is effectively the 'model'. All state should be held in this object. */
-/* Dependencies: OTC_BACKEND */
+/*
+* This is effectively the 'model'. All application state should be held in this object.
+* This should not depend on OTC_UI.
+* Dependencies: OTC_BACKEND
+*/
 
 OTC = {
   logged_in: false,
   websocket: null,
   
   username: null,
+  
+  /* Events management */
+  
+  _events : {},
+  
+  events: {
+    bind: function(event, f) {
+      this._events[event].append(f);
+    },
+    trigger: function(event, info) {
+      if(!this._events[event]) {
+        console.log('Uncaught event: '+event);
+        return;
+      }
+      this._events[event].forEach(function(f) { f(info); });
+    }
+  }
   
   /* Log in the user with the IRC server, and run a callback after that is done */
   login: function(username, password, success, failure) {
@@ -93,7 +123,6 @@ OTC = {
       OTC.username=username;
       success();
     }
-    return this;
   }
 }
 
