@@ -20,13 +20,7 @@ OTC_UI = {
       $('#login-submit').button();
       $('#login-form').submit(function(event) {
         event.preventDefault();
-        OTC.login($('#login-username').val(), $('#login-password').val(), function() {
-          /* Login success */
-          OTC_UI.events.afterLogin();
-        }, function(message) {
-          /* Login failure */
-          
-        });
+        OTC.login($('#login-username').val(), $('#login-password').val());
       });
     },
     mainTabs: function() {
@@ -66,10 +60,12 @@ OTC_UI = {
       OTC.requestData('exchangeRates');
       
       
-      OTC.events.bind('login', function() {
-        $("#login-box").dialog('close');
-        /* Load all the user data into the application */
-        OTC_UI.updateContent.username(OTC.username);
+      OTC.events.bind('login', function(data) {
+        if(data.success) {
+          $("#login-box").dialog('close');
+          /* Load all the user data into the application */
+          OTC_UI.updateContent.username(OTC.username);
+        }
       });
       
     },
@@ -98,18 +94,19 @@ OTC = {
   
   events: {
     bind: function(event, f) {
-      this._events[event].append(f);
+      OTC._events[event] = OTC._events[event] || [];
+      OTC._events[event].push(f);
     },
     trigger: function(event, info) {
-      if(!this._events[event]) {
+      if(!OTC._events[event]) {
         console.log('Unbound event: '+event);
         return;
       }
-      this._events[event].forEach(function(f) { f(info); });
+      OTC._events[event].forEach(function(f) { f(info); });
     }
   },
   
-  /* This function requests data from the backend. The appropriate event will fire when the data is ready */
+  /* This function requests data from the backend. The appropriate data.* event will fire when the data is ready */
   requestData: function(name) {
     if(OTC_BACKEND[name]) {
       OTC.events.trigger('data.'+name, OTC_BACKEND[name]);
@@ -122,7 +119,7 @@ OTC = {
       failure('User is already logged in');
     } else {
       OTC.username=username;
-      success();
+      OTC.events.trigger('login', {sucess:true});
     }
   }
 }
