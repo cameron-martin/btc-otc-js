@@ -55,23 +55,6 @@ OTC_UI = {
     }
   },
   
-  /*
-  update: function(items) {
-    if(!Array.isArray(items)) {
-      items = [items];
-    }
-   items.forEach(function(item) {
-      OTC_UI.updateContent[item]();
-    });
-  },
-  */
-  
-  /* Call this function when waiting for content to load */
-  /*waitFor: function(content) {
-    OTC.loading.append(content);
-  }
-  */
-  
   events: {
     /* This will run when the application loads */
     /* This load event should probably go into the object constructor. Fix this */
