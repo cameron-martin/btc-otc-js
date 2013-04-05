@@ -98,7 +98,7 @@ OTC = {
   
   username: null,
   
-  /* Events management */
+  /* Events management - at the moment this just relays events from the backend server */
   
   _events : {},
   
@@ -108,12 +108,12 @@ OTC = {
     },
     trigger: function(event, info) {
       if(!this._events[event]) {
-        console.log('Uncaught event: '+event);
+        console.log('Unbound event: '+event);
         return;
       }
       this._events[event].forEach(function(f) { f(info); });
     }
-  }
+  },
   
   /* Log in the user with the IRC server, and run a callback after that is done */
   login: function(username, password, success, failure) {
