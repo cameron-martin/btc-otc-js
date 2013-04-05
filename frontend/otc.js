@@ -45,16 +45,17 @@ OTC_UI = {
   
   /* Functions which load/update the dynamic content */
   updateContent: {
-    exchangeRates: function() {
+    exchangeRates: function(data) {
       ['ask', 'bid', 'spread'].forEach(function(prop) {
-        $('#exr-'+prop).text(OTC_BACKEND.exchangeRates[prop]);
+        $('#exr-'+prop).text(data[prop]);
       });
     },
-    username: function() {
-      $('#display-username').text(OTC.username);
+    username: function(data) {
+      $('#display-username').text(data);
     }
   },
   
+  /*
   update: function(items) {
     if(!Array.isArray(items)) {
       items = [items];
@@ -63,6 +64,7 @@ OTC_UI = {
       OTC_UI.updateContent[item]();
     });
   },
+  */
   
   /* Call this function when waiting for content to load */
   /*waitFor: function(content) {
@@ -74,14 +76,19 @@ OTC_UI = {
     /* This will run when the application loads */
     /* This load event should probably go into the object constructor. Fix this */
     load: function() {
+    
       OTC_UI.render(['loginBox', 'mainTabs']);
-      OTC_UI.update(['exchangeRates']);
+    
+      OTC.events.bind('data.exchangeRates', OTC_UI.updateContent.exchangeRates);
+      OTC.requestData('exchangeRates');
+      
       
       OTC.events.bind('login', function() {
         $("#login-box").dialog('close');
         /* Load all the user data into the application */
-        OTC_UI.update('username');
+        OTC_UI.updateContent.username(OTC.username);
       });
+      
     },
   },
 };
@@ -98,7 +105,11 @@ OTC = {
   
   username: null,
   
-  /* Events management - at the moment this just relays events from the backend server */
+  /* Events management */
+  /* List of events that you can bind to:
+   * login: Fired when the server successfully logs
+   * data.*: Fired when data is received from the backend.
+   */
   
   _events : {},
   
@@ -112,6 +123,13 @@ OTC = {
         return;
       }
       this._events[event].forEach(function(f) { f(info); });
+    }
+  },
+  
+  /* This function requests data from the backend. The appropriate event will fire when the data is ready */
+  requestData: function(name) {
+    if(OTC_BACKEND[name]) {
+      OTC.events.trigger('data.'+name, OTC_BACKEND[name]);
     }
   },
   
