@@ -5,26 +5,28 @@
 
 class UserInterface
 
+  OTC: null
+
   constructor: ->
   
-    OTC = new Backend()
+    @OTC = new Backend()
             
     @render 'loginBox', 'mainTabs'
 
-    OTC.bind 'data.exchangeRates', @updateContent.exchangeRates
-    OTC.requestData 'exchangeRates'
+    @OTC.bind 'data.exchangeRates', @updateContent.exchangeRates
+    @OTC.requestData 'exchangeRates'
   
-    OTC.bind 'login', (data) =>
+    @OTC.bind 'login', (data) =>
       unless data.success
         console.log('login failed');
       else
         $('#login-box').dialog 'close'
         # Load all the user data into the application
-        @updateContent.username OTC.username
+        @updateContent.username @OTC.username
   
   # The functions which render the static sections
   renderSection:
-    loginBox: =>
+    loginBox: ->
       $("#login-box").dialog
         modal: true
         autoOpen: true
@@ -32,15 +34,15 @@ class UserInterface
         closeOnEscape: false
         draggable: false
       $('#login-submit').button()
-      $('#login-form').submit (event) ->
+      $('#login-form').submit (event) =>
         event.preventDefault()
-        OTC.login $('#login-username').val(), $('#login-password').val()
-        
+        @OTC.login $('#login-username').val(), $('#login-password').val()
+      
     mainTabs: ->
       $('#main-tabs').tabs()
   
   render: (sections...) ->
-    @renderSection[section]() for section in sections
+    @renderSection[section].call(this) for section in sections
   
   # Functions which load/update the dynamic content
   updateContent:

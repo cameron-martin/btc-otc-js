@@ -5,28 +5,29 @@
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   UserInterface = (function() {
-    var _this = this;
+    UserInterface.prototype.OTC = null;
 
     function UserInterface() {
-      var OTC,
-        _this = this;
+      var _this = this;
 
-      OTC = new Backend();
+      this.OTC = new Backend();
       this.render('loginBox', 'mainTabs');
-      OTC.bind('data.exchangeRates', this.updateContent.exchangeRates);
-      OTC.requestData('exchangeRates');
-      OTC.bind('login', function(data) {
+      this.OTC.bind('data.exchangeRates', this.updateContent.exchangeRates);
+      this.OTC.requestData('exchangeRates');
+      this.OTC.bind('login', function(data) {
         if (!data.success) {
           return console.log('login failed');
         } else {
           $('#login-box').dialog('close');
-          return _this.updateContent.username(OTC.username);
+          return _this.updateContent.username(_this.OTC.username);
         }
       });
     }
 
     UserInterface.prototype.renderSection = {
       loginBox: function() {
+        var _this = this;
+
         $("#login-box").dialog({
           modal: true,
           autoOpen: true,
@@ -37,7 +38,7 @@
         $('#login-submit').button();
         return $('#login-form').submit(function(event) {
           event.preventDefault();
-          return OTC.login($('#login-username').val(), $('#login-password').val());
+          return _this.OTC.login($('#login-username').val(), $('#login-password').val());
         });
       },
       mainTabs: function() {
@@ -52,7 +53,7 @@
       _results = [];
       for (_i = 0, _len = sections.length; _i < _len; _i++) {
         section = sections[_i];
-        _results.push(this.renderSection[section]());
+        _results.push(this.renderSection[section].call(this));
       }
       return _results;
     };
@@ -75,7 +76,7 @@
 
     return UserInterface;
 
-  }).call(this);
+  })();
 
   Backend = (function() {
     function Backend() {
