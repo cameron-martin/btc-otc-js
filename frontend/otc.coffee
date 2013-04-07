@@ -1,15 +1,14 @@
-
 # Handles rendering and attaching event handlers to the UI elements.
 # This is effectively the 'controller' (and partially the view).
 # Only UI-related state should be held here.
-# Dependencies: OTC
+# Dependencies: Backend
 
-class OTC_UI
+class UserInterface
 
   constructor: ->
-    
-    OTC = new _OTC()
-        
+  
+    OTC = new Backend()
+            
     @render 'loginBox', 'mainTabs'
 
     OTC.events.bind 'data.exchangeRates', @updateContent.exchangeRates
@@ -55,21 +54,20 @@ class OTC_UI
       
 
 # This is effectively the 'model'. All application state should be held in this object.
-# This should not depend on OTC_UI.
-# Dependencies: OTC_BACKEND
+# This should not depend on UserInterface.
+# Dependencies: DataSource
 
-class _OTC
+class Backend
   loggedIn: false
   websocket: null
   
   username: null
   
-  ###
-  Events management
-  List of events that you can bind to:
-  login: Fired when the server successfully logs
-  data.*: Fired when data is received from the backend.
-  ###
+  # Events management
+  # List of events that you can bind to:
+  # login: Fired when the server successfully logs
+  # data.*: Fired when data is received from the backend.
+  
   
   _events : {}
   
@@ -87,7 +85,7 @@ class _OTC
   
   # This function requests data from the backend. The appropriate data.* event will fire when the data is ready
   requestData: (name) ->
-    @events.trigger "data.#{name}", OTC_BACKEND[name] if OTC_BACKEND[name]
+    @events.trigger "data.#{name}", DataSource[name] if DataSource[name]
 
   
   # Log in the user with the IRC server, then trigger the login event once that's done.
@@ -99,7 +97,7 @@ class _OTC
 
 # This is basically the 'data source'. It will do until I get the actual IRC-communicating backend sorted.
 # Dependencies: None
-OTC_BACKEND = 
+DataSource = 
   exchangeRates:
     ask: 88.76000
     bid: 87.18166
@@ -107,4 +105,4 @@ OTC_BACKEND =
 
 # Triggers the OTC_UI load event
 $ ->
-  new OTC_UI()
+  new UserInterface()
