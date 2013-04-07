@@ -11,10 +11,10 @@ class UserInterface
             
     @render 'loginBox', 'mainTabs'
 
-    OTC.events.bind 'data.exchangeRates', @updateContent.exchangeRates
+    OTC.bind 'data.exchangeRates', @updateContent.exchangeRates
     OTC.requestData 'exchangeRates'
   
-    OTC.events.bind 'login', (data) =>
+    OTC.bind 'login', (data) =>
       unless data.success
         console.log('login failed');
       else
@@ -71,28 +71,27 @@ class Backend
   
   _events : {}
   
-  events:
-    bind: (event, f) =>
-      @_events[event] = @_events[event] || []
-      @_events[event].push f
+  bind: (event, f) =>
+    @_events[event] = @_events[event] || []
+    @_events[event].push f
     
-    trigger: (event, info) =>
-      unless @_events[event]
-        console.log "Unbound event: #{event}"
-        return
-      f info for f in @_events[event]
+  trigger: (event, info) =>
+    unless @_events[event]
+      console.log "Unbound event: #{event}"
+      return
+    f info for f in @_events[event]
   
   
   # This function requests data from the backend. The appropriate data.* event will fire when the data is ready
   requestData: (name) ->
-    @events.trigger "data.#{name}", DataSource[name] if DataSource[name]
+    @trigger "data.#{name}", DataSource[name] if DataSource[name]
 
   
   # Log in the user with the IRC server, then trigger the login event once that's done.
   login: (username, password) ->
     unless @loggedIn
       @username = username
-      @events.trigger 'login', {success:true}
+      @trigger 'login', {success:true}
 
 
 # This is basically the 'data source'. It will do until I get the actual IRC-communicating backend sorted.
